@@ -3,6 +3,21 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from datacenter.models import Schoolkid, Subject, Lesson, Commendation, Mark, Chastisement
 
 
+COMMENDATIONS = [
+    'Молодец!',
+    'Отлично!',
+    'Хорошая работа!',
+    'Ты меня приятно удивил!',
+    'Замечательно!',
+    'Великолепно!',
+    'Прекрасно!',
+    'Очень хороший ответ!',
+    'Талантливо!',
+    'Ты сегодня прыгнул выше головы!',
+    'Уже существенно лучше!'
+]
+
+
 def get_child_name(name):
     try:
         return Schoolkid.objects.get(full_name__contains=name)
@@ -34,6 +49,9 @@ def create_commendation(schoolkid_name, subject_title):
     except Subject.DoesNotExist:
         print(f'Предмет "{subject_title}" для {kid.year_of_study} класса не найден.')
         return
+    except Subject.MultipleObjectsReturned:
+        print(f'Найдено несколько предметов с названием "{subject_title}" для {kid.year_of_study} класса.')
+        return
 
     lesson = Lesson.objects.filter(
         subject=subject,
@@ -45,22 +63,8 @@ def create_commendation(schoolkid_name, subject_title):
         print('Урок по этому предмету не найден.')
         return
 
-    commendations = [
-        'Молодец!',
-        'Отлично!',
-        'Хорошая работа!',
-        'Ты меня приятно удивил!',
-        'Замечательно!',
-        'Великолепно!',
-        'Прекрасно!',
-        'Очень хороший ответ!',
-        'Талантливо!',
-        'Ты сегодня прыгнул выше головы!',
-        'Уже существенно лучше!'
-    ]
-
     Commendation.objects.create(
-        text=random.choice(commendations),
+        text=random.choice(COMMENDATIONS),
         created=lesson.date,
         schoolkid=kid,
         subject=subject,
